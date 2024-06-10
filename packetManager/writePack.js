@@ -18,13 +18,12 @@ class WritePack {
   }
 
   writeTodayInfo(packName, data) {
-    return this._writeInfo(
-      getDayPath(dayjs().format("YYYY-MM-DD"), packName),
-      data,
-    );
+    return this._writeInfo(getDayPath(packName), data);
   }
 
-  writeTgz(path) {}
+  writeTgz(packPath, version) {
+    return fs.outputFile(path.join(packPath, `${version}.tgz`), data);
+  }
 }
 
 module.exports = WritePack;

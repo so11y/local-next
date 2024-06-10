@@ -1,8 +1,19 @@
 const axios = require("axios");
 
+const TIMEOUT = 10000;
 const requireImpl = axios.create({
   baseURL: "https://registry.npmjs.org/",
-  timeout: 10000,
+  timeout: TIMEOUT,
 });
 
-module.exports = requireImpl;
+function getTgz(tarballUrl) {
+  return requireImpl({
+    url: tarballUrl,
+    method: "GET",
+    responseType: "stream",
+    timeout: TIMEOUT,
+  });
+}
+
+module.exports.requireImpl = requireImpl;
+module.exports.getTgz = getTgz;

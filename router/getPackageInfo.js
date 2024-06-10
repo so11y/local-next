@@ -1,6 +1,3 @@
-const fs = require("fs-extra");
-const requireImpl = require("../request");
-
 async function getPackageInfo(req, res) {
   const { packageName } = req.params;
   const { manager } = req;
