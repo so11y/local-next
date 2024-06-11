@@ -2,7 +2,7 @@ async function getPackageInfo(req, res) {
   const { packageName } = req.params;
   const { manager } = req;
   try {
-    const packInfo = await manager.writeInfo(packageName);
+    const packInfo = await manager.getInfo(packageName);
     res.send(packInfo);
   } catch (error) {
     console.log(error);

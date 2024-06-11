@@ -1,77 +1,20 @@
 const WritePack = require("./writePack");
-const { requireImpl, getTgz } = require("../request");
-const path = require("path");
-const fs = require("fs-extra");
 const { isOutside } = require("../const");
-const { PassThrough } = require("stream");
-const { getOutlinePath, getLocalPath, getDayPath } = require("../share");
-
-function createWriteStream(readStream) {
-  const passThrough = new PassThrough();
-  readStream.pipe(passThrough);
-  function createStream(packagePath) {
-    const stream = fs.createWriteStream(packagePath);
-    fs.ensureDirSync(path.dirname(packagePath));
-    passThrough.pipe(stream);
-    return stream;
-  }
-  return { passThrough, createStream };
-}
 
 class PackageManager {
   writePack = new WritePack();
-  async writeInfo(packageName) {
-    const packData = await requireImpl.get(packageName);
-    const packageInfo = packData.data;
-    Object.keys(packageInfo.versions).forEach((version) => {
-      packageInfo.versions[
-        version
-      ].dist.tarball = `http://localhost:4873/package/${packageName}/${version}`;
-    });
-    const jsonPack = JSON.stringify(packageInfo);
-    if (!this.hasOutside(packageName)) {
-      this.writePack.writeTodayInfo(packageName, jsonPack);
+  async getInfo(packageName) {
+    if (isOutside()) {
+      return await this.writePack.writeInfo(packageName);
     }
-    this.writePack.writeOutlineInfo(packageName, jsonPack);
-
-    return jsonPack;
+    //TODO inside
   }
 
-  async writeOutsideTgz(packageName, version) {
-    const { data } = await requireImpl.get(packageName);
-    const { data: downloadData } = await getTgz(
-      data.versions[version].dist.tarball
-    );
-    const { passThrough, createStream } = createWriteStream(downloadData);
-    if (!this.hasOutside(packageName, version)) {
-      createStream(getDayPath(path.join(packageName, `${version}.tgz`)));
+  async getTgz(packageName, version) {
+    if (isOutside()) {
+      return await this.writePack.writeOutsideTgz(packageName, version);
     }
-    const packagePath = getOutlinePath(
-      path.join(packageName, `${version}.tgz`)
-    );
-    createStream(packagePath);
-
-    return await new Promise((resolve, reject) => {
-      passThrough.on("end", () => {
-        resolve(packagePath);
-      });
-      passThrough.on("error", () => {
-        reject();
-      });
-    });
-  }
-
-  hasOutside(packageName, version) {
-    if (!version) {
-      return (
-        isOutside() &&
-        fs.existsSync(getOutlinePath(path.join(packageName, "package.json")))
-      );
-    }
-    return (
-      isOutside() &&
-      fs.existsSync(getOutlinePath(path.join(packageName, `${version}.tgz`)))
-    );
+    //TODO inside
   }
 }
 
