@@ -6,8 +6,9 @@ const { isOutside } = require("../const");
 const { PassThrough } = require("stream");
 const { getOutlinePath, getLocalPath, getDayPath } = require("../share");
 
-function createWriteStream() {
+function createWriteStream(readStream) {
   const passThrough = new PassThrough();
+  readStream.pipe(passThrough);
   function createStream(packagePath) {
     const stream = fs.createWriteStream(packagePath);
     fs.ensureDirSync(path.dirname(packagePath));
@@ -38,8 +39,10 @@ class PackageManager {
 
   async writeOutsideTgz(packageName, version) {
     const { data } = await requireImpl.get(packageName);
-    const downloadData = await getTgz(data.versions[version].dist.tarball);
-    const { passThrough, createStream } = createWriteStream();
+    const { data: downloadData } = await getTgz(
+      data.versions[version].dist.tarball
+    );
+    const { passThrough, createStream } = createWriteStream(downloadData);
     if (!this.hasOutside(packageName, version)) {
       createStream(getDayPath(path.join(packageName, `${version}.tgz`)));
     }
@@ -47,7 +50,6 @@ class PackageManager {
       path.join(packageName, `${version}.tgz`)
     );
     createStream(packagePath);
-    downloadData.data.pipe(passThrough);
 
     return await new Promise((resolve, reject) => {
       passThrough.on("end", () => {
