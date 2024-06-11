@@ -9,12 +9,10 @@ async function getPackageTgz(req, res) {
     while (attempt < MAX_RETRIES) {
       attempt++;
       const packInfo = await manager.writeOutsideTgz(packageName, version);
-      console.log(packInfo, "1-1-1-");
       res.sendFile(packInfo);
       break;
     }
   } catch (error) {
-    console.log(error, "d-d-d-");
     if (attempt >= MAX_RETRIES) {
       res.status(404).send("Package not found");
     }

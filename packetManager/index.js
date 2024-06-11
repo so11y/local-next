@@ -39,7 +39,6 @@ class PackageManager {
   async writeOutsideTgz(packageName, version) {
     const { data } = await requireImpl.get(packageName);
     const downloadData = await getTgz(data.versions[version].dist.tarball);
-
     const { passThrough, createStream } = createWriteStream();
     if (!this.hasOutside(packageName, version)) {
       createStream(getDayPath(path.join(packageName, `${version}.tgz`)));
@@ -49,15 +48,12 @@ class PackageManager {
     );
     createStream(packagePath);
     downloadData.data.pipe(passThrough);
-    console.log(packagePath, "---packagePath");
 
-    await new Promise((resolve, reject) => {
-      downloadData.data.on("finish", () => {
-        passThrough.end();
+    return await new Promise((resolve, reject) => {
+      passThrough.on("end", () => {
         resolve(packagePath);
       });
-      downloadData.data.on("error", () => {
-        passThrough.end();
+      passThrough.on("error", () => {
         reject();
       });
     });
