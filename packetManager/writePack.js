@@ -28,10 +28,6 @@ class WritePack {
     return this._writeInfo(getDayPath(packName), data);
   }
 
-  writeTgz(packPath, version) {
-    return fs.outputFile(path.join(packPath, `${version}.tgz`), data);
-  }
-
   async writeInfo(packageName) {
     const { data: packageInfo } = await requireImpl.get(packageName);
     Object.keys(packageInfo.versions).forEach((version) => {

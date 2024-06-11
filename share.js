@@ -28,6 +28,7 @@ function hasOutside(packageName, version) {
 }
 
 function createWriteStream() {
+  //TODO: 还是需要监听文件流写入完成的事件
   const passThrough = new PassThrough();
   function createStream(packagePath) {
     const stream = fs.createWriteStream(packagePath);
