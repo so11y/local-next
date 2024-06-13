@@ -1,6 +1,7 @@
 async function getPackageInfo(req, res) {
   const { packageName } = req.params;
-  const { manager } = req;
+  const { manager, logger } = req;
+  logger.packageName(packageName);
   try {
     res.send(await manager.getInfo(packageName));
   } catch (error) {

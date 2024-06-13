@@ -1,4 +1,6 @@
-async function getTgz(packageName, version, manager, res) {
+async function getTgz(packageName, version, req, res) {
+  const { manager, logger } = req;
+  // logger.packageName(`${packageName}/${version}.tgz`);
   try {
     res.sendFile(await manager.getTgz(packageName, version));
   } catch (error) {
@@ -8,13 +10,11 @@ async function getTgz(packageName, version, manager, res) {
 
 function getPackageTgz(req, res) {
   const { packageName, version } = req.params;
-  const { manager } = req;
-  getTgz(packageName, version, manager, res);
+  getTgz(packageName, version, req, res);
 }
 async function getScopePackageTgz(req, res) {
   const { scope, packageName, version } = req.params;
-  const { manager } = req;
-  getTgz(`${scope}/${packageName}`, version, manager, res);
+  getTgz(`${scope}/${packageName}`, version, req, res);
 }
 
 module.exports = {

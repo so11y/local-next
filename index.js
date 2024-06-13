@@ -3,6 +3,7 @@ const setup = require("./setup");
 const getPackageInfo = require("./router/getPackageInfo");
 const { getPackageTgz, getScopePackageTgz } = require("./router/getPackageTgz");
 const packageManager = require("./packetManager");
+const { createLog, logger } = require("./log");
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use((req, _res, next) => {
   req.manager = manager;
   next();
 });
+app.use(createLog);
 
 app.get("/:packageName", getPackageInfo);
 app.get("/package/:packageName/:version", getPackageTgz);
@@ -25,5 +27,5 @@ app.get("/package/:scope/:packageName/:version", getScopePackageTgz);
 
 app.listen(4873, () => {
   setup();
-  console.log("Server is running on port 4873");
+  logger.info("Server is running on port 4873");
 });

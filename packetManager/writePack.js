@@ -37,17 +37,20 @@ class WritePack {
         version
       ].dist.tarball = `${ip}/package/${packageName}/${version}`;
     });
-    const jsonPack = JSON.stringify(packageInfo);
+    const jsonInfo = JSON.stringify(packageInfo);
     if (!hasOutside(packageName)) {
-      this.writeTodayInfo(packageName, jsonPack);
+      this.writeTodayInfo(packageName, jsonInfo);
     }
-    this.writeOutlineInfo(packageName, jsonPack);
-    return jsonPack;
+    this.writeOutlineInfo(packageName, jsonInfo);
+    return jsonInfo;
   }
 
   async writeOutsideTgz(packageName, version) {
     let attempt = 0;
     const { withComplete, createStream, pipe } = createWriteStream();
+    const maybeHavePackagePath = getOutlinePath(
+      path.join(packageName, `${version}.tgz`)
+    );
     const downloadAndCreatePackagePath = async () => {
       while (attempt < MAX_RETRIES) {
         try {
@@ -60,11 +63,8 @@ class WritePack {
           if (!hasOutside(packageName, version)) {
             createStream(getDayPath(path.join(packageName, `${version}.tgz`)));
           }
-          const packagePath = getOutlinePath(
-            path.join(packageName, `${version}.tgz`)
-          );
-          createStream(packagePath);
-          return packagePath;
+          createStream(maybeHavePackagePath);
+          return maybeHavePackagePath;
         } catch (error) {
           if (attempt >= MAX_RETRIES) {
             return Promise.reject("Package not found");
@@ -72,9 +72,12 @@ class WritePack {
         }
       }
     };
-    const packagePath = await downloadAndCreatePackagePath();
+    if (fs.existsSync(maybeHavePackagePath)) {
+      return maybeHavePackagePath;
+    }
+    const selfPackagePath = await downloadAndCreatePackagePath();
     await withComplete();
-    return packagePath;
+    return selfPackagePath;
   }
 }
 

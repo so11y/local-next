@@ -11,10 +11,7 @@ class PackageManager {
   }
 
   async getTgz(packageName, version) {
-    if (isOutside()) {
-      return await this.writePack.writeOutsideTgz(packageName, version);
-    }
-    //TODO inside
+    return await this.writePack.writeOutsideTgz(packageName, version);
   }
 }
 
