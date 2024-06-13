@@ -1,6 +1,6 @@
 async function getTgz(packageName, version, req, res) {
   const { manager, logger } = req;
-  // logger.packageName(`${packageName}/${version}.tgz`);
+  logger.packageName(`${packageName}/${version}.tgz`);
   try {
     res.sendFile(await manager.getTgz(packageName, version));
   } catch (error) {

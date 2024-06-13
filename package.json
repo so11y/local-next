@@ -1,6 +1,7 @@
 {
   "devDependencies": {
     "axios": "^1.7.2",
+    "chalk": "^4.1.2",
     "dayjs": "^1.11.11",
     "express": "^4.19.2",
     "fast-glob": "^3.3.2",
