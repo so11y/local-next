@@ -30,16 +30,39 @@ function hasOutside(packageName, version) {
 function createWriteStream() {
   //TODO: 还是需要监听文件流写入完成的事件
   const passThrough = new PassThrough();
+  const fsStreams = [];
   function createStream(packagePath) {
     const stream = fs.createWriteStream(packagePath);
     fs.ensureDirSync(path.dirname(packagePath));
     passThrough.pipe(stream);
+    fsStreams.push(stream);
     return stream;
   }
   function pipe(readStream) {
     readStream.pipe(passThrough);
   }
-  return { passThrough, createStream, pipe };
+  function withComplete() {
+    return Promise.all(
+      fsStreams.map((steam) => {
+        return new Promise((resolve, reject) => {
+          steam.on("finish", resolve);
+          steam.on("error", reject);
+        });
+      })
+    );
+  }
+  return { passThrough, createStream, pipe, withComplete };
+}
+
+function getEnvironment() {
+  if (isOutside()) {
+    return {
+      ip: "http://localhost:4873",
+    };
+  }
+  return {
+    ip: "http://localhost:4873",
+  };
 }
 
 module.exports = {
@@ -48,4 +71,5 @@ module.exports = {
   getLocalPath,
   getDayPath,
   hasOutside,
+  getEnvironment,
 };

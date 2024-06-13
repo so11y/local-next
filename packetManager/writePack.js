@@ -7,6 +7,7 @@ const {
   getDayPath,
   hasOutside,
   createWriteStream,
+  getEnvironment,
 } = require("../share");
 
 const MAX_RETRIES = 5;
@@ -30,10 +31,11 @@ class WritePack {
 
   async writeInfo(packageName) {
     const { data: packageInfo } = await requireImpl.get(packageName);
+    const { ip } = getEnvironment();
     Object.keys(packageInfo.versions).forEach((version) => {
       packageInfo.versions[
         version
-      ].dist.tarball = `http://localhost:4873/package/${packageName}/${version}`;
+      ].dist.tarball = `${ip}/package/${packageName}/${version}`;
     });
     const jsonPack = JSON.stringify(packageInfo);
     if (!hasOutside(packageName)) {
@@ -45,8 +47,8 @@ class WritePack {
 
   async writeOutsideTgz(packageName, version) {
     let attempt = 0;
-    const { passThrough, createStream, pipe } = createWriteStream();
-    const getPackagePath = async () => {
+    const { withComplete, createStream, pipe } = createWriteStream();
+    const downloadAndCreatePackagePath = async () => {
       while (attempt < MAX_RETRIES) {
         try {
           attempt++;
@@ -70,11 +72,9 @@ class WritePack {
         }
       }
     };
-    return await new Promise(async (resolve, reject) => {
-      const packagePath = await getPackagePath();
-      passThrough.on("end", () => resolve(packagePath));
-      passThrough.on("error", reject);
-    });
+    const packagePath = await downloadAndCreatePackagePath();
+    await withComplete();
+    return packagePath;
   }
 }
 
