@@ -51,7 +51,7 @@ class WritePack {
       version
     );
     if (hasExist) {
-      logger.success(`Tgz cache: ${error.message}`);
+      logger.success(`Tgz cache: ${packageName}/${version}.tgz`);
       return hasExist;
     }
     const downloadAndCreatePackagePath = async () => {

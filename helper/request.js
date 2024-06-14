@@ -1,7 +1,7 @@
 const axios = require("axios");
 const { logger } = require("./log");
 
-const TIMEOUT = 10000;
+const TIMEOUT = 5000;
 const requireImpl = axios.create({
   baseURL: "https://registry.npmjs.org/",
   timeout: TIMEOUT,
