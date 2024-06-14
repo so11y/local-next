@@ -1,9 +1,11 @@
 async function getTgz(packageName, version, req, res) {
   const { manager, logger } = req;
-  logger.packageName(`${packageName}/${version}.tgz`);
   try {
-    res.sendFile(await manager.getTgz(packageName, version));
+    const path = await manager.getTgz(packageName, version);
+    logger.success(`${packageName}/${version}.tgz`);
+    res.sendFile(path);
   } catch (error) {
+    console.error(error);
     res.status(404).send("Package not found");
   }
 }

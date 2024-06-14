@@ -1,17 +1,22 @@
 const WritePack = require("./writePack");
-const { isOutside } = require("../const");
+const ReadPack = require("./readPack");
+const { whereEnvironment } = require("../helper/share");
 
 class PackageManager {
   writePack = new WritePack();
-  async getInfo(packageName) {
-    if (isOutside()) {
-      return await this.writePack.writeInfo(packageName);
-    }
-    //TODO inside
+  readPack = new ReadPack();
+  getInfo(packageName) {
+    return whereEnvironment(
+      () => this.writePack.writeInfo(packageName),
+      () => this.readPack.readInfo(packageName)
+    );
   }
 
-  async getTgz(packageName, version) {
-    return await this.writePack.writeOutsideTgz(packageName, version);
+  getTgz(packageName, version) {
+    return whereEnvironment(
+      () => this.writePack.writeOutsideTgz(packageName, version),
+      () => this.readPack.readTgz(packageName, version)
+    );
   }
 }
 

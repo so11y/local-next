@@ -1,10 +1,18 @@
 const axios = require("axios");
+const { logger } = require("./log");
 
 const TIMEOUT = 10000;
 const requireImpl = axios.create({
   baseURL: "https://registry.npmjs.org/",
   timeout: TIMEOUT,
 });
+
+// requireImpl.interceptors.response.use(
+//   (v) => v,
+//   (e) => {
+//     return Promise.reject(e);
+//   }
+// );
 
 function getTgz(tarballUrl) {
   return requireImpl({

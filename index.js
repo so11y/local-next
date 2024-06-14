@@ -3,7 +3,7 @@ const setup = require("./setup");
 const getPackageInfo = require("./router/getPackageInfo");
 const { getPackageTgz, getScopePackageTgz } = require("./router/getPackageTgz");
 const packageManager = require("./packetManager");
-const { createLog, logger } = require("./log");
+const { createLog } = require("./helper/log");
 
 const app = express();
 
@@ -25,7 +25,19 @@ app.get("/:packageName", getPackageInfo);
 app.get("/package/:packageName/:version", getPackageTgz);
 app.get("/package/:scope/:packageName/:version", getScopePackageTgz);
 
-app.listen(4873, () => {
-  setup();
-  logger.info("Server is running on port 4873");
-});
+app.listen(4873, setup);
+
+// const path = require("path");
+// const { getOutlinePath, getDayPath } = require("./helper/share");
+// const fs = require("fs");
+// const vueComplier = getOutlinePath("@vue/a/b/b/d");
+// const lodash = getOutlinePath("lodash");
+
+// // fs.symlinkSync(
+// //   vueComplier,
+// //   path.join(process.cwd(), "pack", "2024-06-14", "@vue")
+// // );
+
+// // const v = fs.lstatSync(getOutlinePath("lodash"));
+// // console.log(v.isSymbolicLink());
+// // console.log(files, "-d--d");

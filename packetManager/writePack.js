@@ -1,16 +1,18 @@
 const path = require("path");
 const fs = require("fs-extra");
-const { requireImpl, getTgz } = require("../request");
+const { requireImpl, getTgz } = require("../helper/request");
+const { logger } = require("../helper/log");
+const { MAX_RETRIES } = require("../helper/const");
 const {
   getOutlinePath,
   getLocalPath,
   getDayPath,
   hasOutside,
   createWriteStream,
-  getEnvironment,
-} = require("../share");
-
-const MAX_RETRIES = 5;
+  overwriteTarBall,
+  getTgzPath,
+  createSymLinkSync,
+} = require("../helper/share");
 
 class WritePack {
   _writeInfo(packPath, data) {
@@ -31,26 +33,27 @@ class WritePack {
 
   async writeInfo(packageName) {
     const { data: packageInfo } = await requireImpl.get(packageName);
-    const { ip } = getEnvironment();
-    Object.keys(packageInfo.versions).forEach((version) => {
-      packageInfo.versions[
-        version
-      ].dist.tarball = `${ip}/package/${packageName}/${version}`;
-    });
+    overwriteTarBall(packageInfo);
     const jsonInfo = JSON.stringify(packageInfo);
-    if (!hasOutside(packageName)) {
-      this.writeTodayInfo(packageName, jsonInfo);
+    const hasCache = hasOutside(packageName);
+    await this.writeOutlineInfo(packageName, jsonInfo);
+    if (!hasCache) {
+      createSymLinkSync(packageName);
     }
-    this.writeOutlineInfo(packageName, jsonInfo);
     return jsonInfo;
   }
 
   async writeOutsideTgz(packageName, version) {
     let attempt = 0;
     const { withComplete, createStream, pipe } = createWriteStream();
-    const maybeHavePackagePath = getOutlinePath(
-      path.join(packageName, `${version}.tgz`)
+    const [hasExist, maybeHaveOutsidePackagePath] = getTgzPath(
+      packageName,
+      version
     );
+    if (hasExist) {
+      logger.success(`Tgz cache: ${error.message}`);
+      return hasExist;
+    }
     const downloadAndCreatePackagePath = async () => {
       while (attempt < MAX_RETRIES) {
         try {
@@ -61,20 +64,18 @@ class WritePack {
           );
           pipe(downloadData);
           if (!hasOutside(packageName, version)) {
-            createStream(getDayPath(path.join(packageName, `${version}.tgz`)));
+            createSymLinkSync(packageName);
           }
-          createStream(maybeHavePackagePath);
-          return maybeHavePackagePath;
+          createStream(maybeHaveOutsidePackagePath);
+          return maybeHaveOutsidePackagePath;
         } catch (error) {
           if (attempt >= MAX_RETRIES) {
             return Promise.reject("Package not found");
           }
+          logger.error(`Download tgz: ${error.message}`);
         }
       }
     };
-    if (fs.existsSync(maybeHavePackagePath)) {
-      return maybeHavePackagePath;
-    }
     const selfPackagePath = await downloadAndCreatePackagePath();
     await withComplete();
     return selfPackagePath;
