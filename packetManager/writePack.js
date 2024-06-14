@@ -70,9 +70,9 @@ class WritePack {
           return maybeHaveOutsidePackagePath;
         } catch (error) {
           if (attempt >= MAX_RETRIES) {
+            logger.error(`Download tgz: ${error.message}`);
             return Promise.reject("Package not found");
           }
-          logger.error(`Download tgz: ${error.message}`);
         }
       }
     };
