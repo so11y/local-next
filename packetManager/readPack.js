@@ -1,3 +1,5 @@
+const path = require("path");
+const fs = require("fs-extra");
 const { getOutlinePath, getTgzPath } = require("../helper/share");
 const { overwriteTarBall } = require("../helper/effect");
 
@@ -9,7 +11,7 @@ class ReadPack {
     if (!fs.existsSync(maybeHaveOutsidePackagePath)) {
       throw new Error("package not found");
     }
-    const packageInfo = fs.readFileSync(maybeHaveOutsidePackagePath, "utf-8");
+    const packageInfo = fs.readJsonSync(maybeHaveOutsidePackagePath, "utf-8");
     overwriteTarBall(packageInfo);
     return JSON.stringify(packageInfo);
   }

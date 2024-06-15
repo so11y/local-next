@@ -6,6 +6,7 @@ const packageManager = require("./packetManager");
 const { createLog } = require("./helper/log");
 
 const app = express();
+const listener = setup();
 
 const manager = new packageManager();
 
@@ -25,4 +26,4 @@ app.get("/:packageName", getPackageInfo);
 app.get("/package/:packageName/:version", getPackageTgz);
 app.get("/package/:scope/:packageName/:version", getScopePackageTgz);
 
-app.listen(process.env.SERVER_PORT, setup);
+app.listen(process.env.SERVER_PORT, listener);
