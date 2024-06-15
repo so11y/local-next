@@ -32,16 +32,16 @@ function createWriteStream() {
 
 function createSymLinkSync(packageName) {
   const [targetName] = packageName.split(path.sep);
-  const dayPath = getDayPath();
   const linkPath = getDayPath(targetName);
-  if (fs.lstatSync(linkPath).isSymbolicLink()) {
+  const targetPath = getOutlinePath(targetName);
+  if (!fs.existsSync(targetPath)) {
     return;
   }
-  if (!fs.existsSync(dayPath)) {
-    fs.ensureDirSync(dayPath);
+  if (fs.existsSync(linkPath) && fs.lstatSync(linkPath).isSymbolicLink()) {
+    return;
   }
   try {
-    fs.symlinkSync(getOutlinePath(targetName), linkPath, "dir");
+    fs.symlinkSync(targetPath, linkPath, "dir");
   } catch (error) {
     logger.internalError(`createSymLinkSync error: ${error}`);
   }
