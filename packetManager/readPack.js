@@ -1,8 +1,5 @@
-const {
-  getOutlinePath,
-  overwriteTarBall,
-  getTgzPath,
-} = require("../helper/share");
+const { getOutlinePath, getTgzPath } = require("../helper/share");
+const { overwriteTarBall } = require("../helper/effect");
 
 class ReadPack {
   readInfo(packageName) {

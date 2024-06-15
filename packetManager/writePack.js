@@ -8,11 +8,13 @@ const {
   getLocalPath,
   getDayPath,
   hasOutside,
+  getTgzPath,
+} = require("../helper/share");
+const {
   createWriteStream,
   overwriteTarBall,
-  getTgzPath,
   createSymLinkSync,
-} = require("../helper/share");
+} = require("../helper/effect");
 
 class WritePack {
   _writeInfo(packPath, data) {
