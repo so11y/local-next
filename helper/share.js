@@ -3,6 +3,7 @@ const fs = require("fs-extra");
 const dayjs = require("dayjs");
 const { PassThrough } = require("stream");
 const { OUTLINE_DIR, LOCAL_DIR, PACK_DIR } = require("./const");
+const { logger } = require("./log");
 
 function getOutlinePath(_path = "") {
   return path.join(process.cwd(), PACK_DIR, OUTLINE_DIR, _path);
@@ -85,16 +86,20 @@ function whereEnvironment(outsideCallback, insideCallback) {
 }
 
 function createSymLinkSync(packageName) {
-  // const [targetName] = packageName.split(path.sep);
-  // const dayPath = getDayPath();
-  // const targetPath = getOutlinePath(targetName);
-  // if (fs.lstatSync(targetPath).isSymbolicLink()) {
-  //   return;
-  // }
-  // if (!fs.existsSync(dayPath)) {
-  //   fs.ensureDirSync(dayPath);
-  // }
-  // fs.symlinkSync(getOutlinePath(targetName), getDayPath(targetName), "dir");
+  const [targetName] = packageName.split(path.sep);
+  const dayPath = getDayPath();
+  const linkPath = getDayPath(targetName);
+  if (fs.lstatSync(linkPath).isSymbolicLink()) {
+    return;
+  }
+  if (!fs.existsSync(dayPath)) {
+    fs.ensureDirSync(dayPath);
+  }
+  try {
+    fs.symlinkSync(getOutlinePath(targetName), linkPath, "dir");
+  } catch (error) {
+    logger.internalError(`createSymLinkSync error: ${error}`);
+  }
 }
 function isOutside() {
   return process.env.SERVER_ENV === "outside";

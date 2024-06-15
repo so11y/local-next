@@ -19,6 +19,9 @@ const logger = {
   packageName(message) {
     this.info(`package-name: ${message}`);
   },
+  internalError(message) {
+    this.error(`Internal Error: ${message}`);
+  },
 };
 
 module.exports = {
