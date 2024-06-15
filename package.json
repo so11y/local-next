@@ -1,7 +1,15 @@
 {
+  "version": "1.0.0",
+  "description": "轻量级的 npm registry 服务。",
   "scripts": {
     "outside": "cross-env SERVER_ENV=outside  node ./index.js",
     "inside": "cross-env SERVER_ENV=inside  node ./index.js"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/so11y/soso",
+  "author": {
+    "name": "zrrz",
+    "email": "247076126@qq.com"
   },
   "devDependencies": {
     "axios": "^1.7.2",
