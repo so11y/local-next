@@ -25,4 +25,4 @@ app.get("/:packageName", getPackageInfo);
 app.get("/package/:packageName/:version", getPackageTgz);
 app.get("/package/:scope/:packageName/:version", getScopePackageTgz);
 
-app.listen(4873, setup);
+app.listen(process.env.SERVER_PORT, setup);
