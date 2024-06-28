@@ -31,7 +31,7 @@ function createWriteStream() {
 }
 
 function createSymLinkSync(packageName) {
-  const [targetName] = packageName.split(path.sep);
+  const [targetName] = packageName.split(path.posix.sep);
   const linkPath = getDayPath(targetName);
   const targetPath = getOutlinePath(targetName);
   if (!fs.existsSync(targetPath)) {
